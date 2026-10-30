@@ -1,0 +1,15 @@
+{
+  "name": "vidawheel-bot-plugin",
+  "version": "0.1.1",
+  "private": true,
+  "type": "module",
+  "engines": {"node": ">=22"},
+  "description": "Desktop-owned MCP bridge; built files are included for Git installation.",
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/bridge.mjs --banner:js=\"import { createRequire } from 'node:module';const require=createRequire(import.meta.url);\"",
+    "check": "tsc --noEmit",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {"@modelcontextprotocol/sdk": "1.32.2", "zod": "4.6.7"},
+  "devDependencies": {"@types/node": "^22.0.0", "esbuild": "0.28.2", "tsx": "^4.20.0", "typescript": "^5.9.0"}
+}

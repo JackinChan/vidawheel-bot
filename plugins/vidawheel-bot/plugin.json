@@ -1,0 +1,17 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "vidawheel-bot",
+  "version": "0.1.1",
+  "description": "Read Feishu collaboration tasks in an explicitly bound local Codex conversation.",
+  "author": {"name": "VidaWheel"},
+  "extensions": {"com.openai": {
+    "requires_local_executor": true,
+    "interface": {
+      "displayName": "VidaWheel Bot",
+      "shortDescription": "飞书协作任务连接器",
+      "developerName": "VidaWheel",
+      "category": "Productivity",
+      "capabilities": []
+    }
+  }}
+}

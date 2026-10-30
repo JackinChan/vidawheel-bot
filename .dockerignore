@@ -11,3 +11,6 @@ config.local.json
 .pytest_cache
 artifacts
 tests
+# Desktop plugins are installed on employee machines, not copied into server images.
+plugins
+.agents

@@ -1,0 +1,10 @@
+{
+  "name": "vidawheel",
+  "interface": {"displayName": "VidaWheel"},
+  "plugins": [{
+    "name": "vidawheel-bot",
+    "source": {"source": "local", "path": "./plugins/vidawheel-bot"},
+    "policy": {"installation": "AVAILABLE", "authentication": "ON_INSTALL"},
+    "category": "Productivity"
+  }]
+}
