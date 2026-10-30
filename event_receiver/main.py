@@ -11,6 +11,16 @@ from bot_core.store import ingest
 log = logging.getLogger(__name__)
 
 
+class SDKLogFilter(logging.Filter):
+    """Remove temporary connection credentials from SDK-generated log messages."""
+
+    def filter(self, record):
+        """Keep operational failures while redacting signed WebSocket query parameters."""
+        record.msg = re.sub(r"wss://\S+", "wss://<redacted>", record.getMessage())
+        record.args = ()
+        return True
+
+
 def handle(code: str, payload: dict) -> bool:
     """Filter scoped mentions and persist before acknowledging the platform event."""
     payload = json.loads(json.dumps(payload))
@@ -70,6 +80,7 @@ def run_bot(code: str):
     import lark_oapi as lark
 
     bot = bot_config(code)
+    logging.getLogger("Lark").addFilter(SDKLogFilter())
 
     def receive(data):
         """Convert the SDK event to a plain envelope without logging its content."""
@@ -79,7 +90,7 @@ def run_bot(code: str):
                   .register_p2_im_message_receive_v1(receive)
                   .register_p2_drive_notice_comment_add_v1(receive).build())
     client = lark.ws.Client(bot["app_id"], os.environ[bot["secret_env"]], event_handler=dispatcher,
-                            log_level=lark.LogLevel.INFO)
+                            log_level=lark.LogLevel.WARNING)
     client.start()
 
 

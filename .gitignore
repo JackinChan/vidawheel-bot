@@ -1,5 +1,8 @@
 # Local credentials and runtime artifacts must remain outside Git.
 .env
+.env.*
+config.*.local.json
+compose.real.local.yaml
 config.local.json
 .venv/
 __pycache__/
