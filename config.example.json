@@ -1,0 +1,13 @@
+{
+  "_comment": "Copy to ignored config.local.json; all credential values come from environment variables.",
+  "bots": [{
+    "code": "moxon",
+    "app_id": "REPLACE_WITH_APP_ID",
+    "tenant_key": "REPLACE_WITH_TENANT_KEY",
+    "open_id": "REPLACE_WITH_BOT_OPEN_ID",
+    "secret_env": "FEISHU_MOXON_SECRET",
+    "allowed_chats": ["REPLACE_WITH_CHAT_ID"],
+    "document_hosts": ["fcnopvst3d8d.feishu.cn"]
+  }],
+  "clients": [{"employee_code": "employee-one", "token_env": "MCP_EMPLOYEE_ONE", "bots": ["moxon"]}]
+}

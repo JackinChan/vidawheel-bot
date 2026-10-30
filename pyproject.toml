@@ -1,0 +1,13 @@
+# Shared package and deployable service entrypoints.
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "vidawheel-bot"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = ["psycopg[binary]>=3.2,<4", "mcp>=1.26,<2", "lark-oapi>=1.4,<2", "httpx>=0.28,<1", "uvicorn>=0.34,<1", "starlette>=0.46,<1"]
+
+[tool.setuptools.packages.find]
+include = ["bot_core*", "event_receiver*", "mcp_server*"]

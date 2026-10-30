@@ -1,0 +1,10 @@
+# Exclude local runtime, credentials, repository metadata and development artifacts.
+.git
+.venv
+.env
+config.local.json
+**/__pycache__
+**/*.egg-info
+.pytest_cache
+artifacts
+tests
