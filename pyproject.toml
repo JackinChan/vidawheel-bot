@@ -10,4 +10,4 @@ requires-python = ">=3.12"
 dependencies = ["psycopg[binary]>=3.2,<4", "mcp>=1.26,<2", "lark-oapi>=1.4,<2", "httpx>=0.28,<1", "uvicorn>=0.34,<1", "starlette>=0.46,<1"]
 
 [tool.setuptools.packages.find]
-include = ["bot_core*", "event_receiver*", "mcp_server*"]
+include = ["bot_core*", "event_receiver*", "mcp_server*", "analysis_worker*"]

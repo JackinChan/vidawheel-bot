@@ -6,7 +6,10 @@
     "tenant_key": "REPLACE_WITH_TENANT_KEY",
     "open_id": "REPLACE_WITH_BOT_OPEN_ID",
     "secret_env": "FEISHU_MOXON_SECRET",
+    "encrypt_key_env": "FEISHU_CALLBACK_ENCRYPT_KEY",
+    "verification_token_env": "FEISHU_CALLBACK_VERIFICATION",
     "allowed_chats": ["REPLACE_WITH_CHAT_ID"],
+    "allowed_documents": ["REPLACE_WITH_DOCX_OBJECT_TOKEN"],
     "document_hosts": ["fcnopvst3d8d.feishu.cn"]
   }],
   "clients": [{"employee_code": "employee-one", "token_env": "MCP_EMPLOYEE_ONE", "bots": ["moxon"]}]

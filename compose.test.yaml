@@ -1,0 +1,16 @@
+# Opt-in synthetic acceptance only. Never apply this override to company deployment.
+services:
+  mcp:
+    environment:
+      BOT_TEST_MODE: "1"
+      TEST_FEISHU_API_BASE: http://fixture:8002
+  fixture:
+    image: vidawheel-bot-mcp:latest
+    command: ["uvicorn", "tests.feishu_fixture:app", "--host", "0.0.0.0", "--port", "8002"]
+    volumes:
+      - ./tests:/app/tests:ro
+  worker:
+    environment:
+      WORKER_TEST_MODE: "1"
+      WORKER_ONCE: "1"
+    restart: "no"

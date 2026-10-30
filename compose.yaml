@@ -20,6 +20,7 @@ services:
     env_file: .env
     environment:
       BOT_CONFIG: /run/config/bots.json
+      MCP_ALLOWED_HOSTS: localhost:*,127.0.0.1:*,mcp:8000
     volumes:
       - ./config.local.json:/run/config/bots.json:ro
     ports:
@@ -41,5 +42,38 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    profiles: ["worker"]
+    command: ["python", "-m", "analysis_worker.main"]
+    env_file: .env
+    environment:
+      WORKER_MCP_URL: http://mcp:8000/mcp
+      WORKER_REPOSITORY: /workspace
+      CODEX_HOME: /home/bot/.codex
+    volumes:
+      - ./worker-workspace:/workspace:ro
+      - codex_home:/home/bot/.codex
+    depends_on:
+      - mcp
+    restart: unless-stopped
+  receiver-http:
+    build: .
+    profiles: ["callback"]
+    command: ["uvicorn", "event_receiver.http:app", "--host", "0.0.0.0", "--port", "8001"]
+    env_file: .env
+    environment:
+      BOT_CONFIG: /run/config/bots.json
+    volumes:
+      - ./config.local.json:/run/config/bots.json:ro
+    ports:
+      - "127.0.0.1:8001:8001"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
 volumes:
   bot_data:
+  codex_home:

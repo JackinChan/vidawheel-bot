@@ -25,7 +25,7 @@ async def main():
         async with ClientSession(read, write) as session:
             await session.initialize()
             tools = await session.list_tools()
-            assert len(tools.tools) == 6
+            assert len(tools.tools) == 8
             listing = await session.call_tool("list_issues", {})
             assert not listing.isError
             claim = await session.call_tool("claim_issue", {})
