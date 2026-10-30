@@ -39,7 +39,7 @@
 
 每个独立应用分别启用机器人能力、长连接事件订阅和 `im.message.receive_v1`，添加到允许群。按平台要求申请群 @消息接收、wiki/docx 读取权限并发布。对目标文档授权应用访问。接收事件时校验 tenant_key、app_id、chat_id 及 mentions 中的机器人 open_id。
 
-支持群聊文本 @及 `drive.notice.comment_add_v1` 文档评论通知。按 SDK schema 校验 `is_mentioned`、`notice_meta.to_user_id.open_id`、文件类型及 `allowed_documents`。评论串按 bot + docx token + comment_id 归并，群消息按 root_id/message_id 归并。必须配置允许读取的 docx 对象 token；Wiki 链接解析后也按对象 token 校验。正文 @、多维表格评论未在 SDK 事件链路内，不能假定它们与 docx 评论事件相同。
+支持群聊文本 @及 `drive.notice.comment_add_v1` 文档评论通知。按 SDK schema 校验 `is_mentioned`、`notice_meta.to_user_id.open_id` 及文件类型。`document_policy=bot_access` 时不逐篇限制文档，按来源机器人的飞书原生权限读取；`document_policy=allowlist` 时额外要求 `allowed_documents`，Wiki 链接解析后按 docx 对象 token 校验。示例配置采用 bot_access，未指定策略的配置保留显式名单模式。评论串按 bot + docx token + comment_id 归并，群消息按 root_id/message_id 归并。正文 @、多维表格评论未在 SDK 事件链路内，不能假定它们与 docx 评论事件相同。
 
 回调模式使用 `docker compose --profile callback up --build -d receiver-http`，通过 HTTPS 反向代理转发 `/events/{bot_code}` 到 8001；配置 `encrypt_key_env` 和 `verification_token_env` 对应环境变量。SDK 校验签名及验证信息，业务回调要求五分钟内时间戳，事件按平台 ID 去重。支持 URL challenge。一个应用在飞书后台选择一种接收模式，不要同时打开两套生产消费链路。
 
@@ -81,5 +81,5 @@ Docker worker 默认只读挂载 `worker-workspace/`，真实项目请挂载经�
 
 - 员工认证采用独立静态 Bearer 凭据，支持通过环境配置轮换；不是完整的公司 SSO/OAuth 授权服务。
 - 文档读取支持 wiki/docx 正文、原始 block、引用及评论串，支持图片交给模型理解；非图像附件、电子表格、多维表格需专门解析器。
-- 文档授权沿用来源机器人身份、域名及 docx 对象 token 白名单；员工授权到机器人级，不自动扩展知识库目录权限。
+- 文档授权沿用来源机器人身份及域名，按 document_policy 选择平台原生权限或额外的对象名单；员工授权到机器人级，不自动扩展飞书权限。
 - 不包含桌面既有聊天自动唤醒、公司服务器部署或自动回复。真实飞书账号、专用容器模型登录及组织 SSO 需由维护人员提供配置，不能伪造为已验收。

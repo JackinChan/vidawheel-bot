@@ -14,6 +14,9 @@ def settings() -> dict:
     ids = [bot["code"] for bot in value["bots"]]
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate bot code")
+    for bot in value["bots"]:
+        if bot.get("document_policy", "allowlist") not in ("allowlist", "bot_access"):
+            raise ValueError("Unknown document policy")
     employees = [client["employee_code"] for client in value["clients"]]
     if len(employees) != len(set(employees)):
         raise ValueError("Duplicate employee code")
@@ -31,3 +34,8 @@ def settings() -> dict:
 def bot_config(code: str) -> dict:
     """Resolve a bot by trusted internal code, never by a client supplied app secret."""
     return next(bot for bot in settings()["bots"] if bot["code"] == code)
+
+
+def document_allowed(bot: dict, token: str) -> bool:
+    """Use platform bot ACLs when selected, otherwise require the explicitly configured token list."""
+    return bot.get("document_policy", "allowlist") == "bot_access" or token in bot.get("allowed_documents", [])

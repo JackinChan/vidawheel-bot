@@ -6,6 +6,7 @@
     "tenant_key": "REPLACE_WITH_TENANT_KEY",
     "open_id": "REPLACE_WITH_BOT_OPEN_ID",
     "secret_env": "FEISHU_MOXON_SECRET",
+    "document_policy": "bot_access",
     "encrypt_key_env": "FEISHU_CALLBACK_ENCRYPT_KEY",
     "verification_token_env": "FEISHU_CALLBACK_VERIFICATION",
     "allowed_chats": ["REPLACE_WITH_CHAT_ID"],

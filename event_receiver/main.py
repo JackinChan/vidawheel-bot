@@ -5,7 +5,7 @@ import multiprocessing
 import os
 import re
 
-from bot_core.config import settings, bot_config
+from bot_core.config import settings, bot_config, document_allowed
 from bot_core.store import ingest
 
 log = logging.getLogger(__name__)
@@ -29,6 +29,7 @@ def handle(code: str, payload: dict) -> bool:
     payload.get("header", {}).pop("token", None)
     bot = bot_config(code)
     header, event = payload.get("header", {}), payload.get("event", {})
+    log.info("Event received bot=%s type=%s event=%s", code, header.get("event_type"), header.get("event_id"))
     if header.get("app_id") != bot["app_id"] or header.get("tenant_key") != bot["tenant_key"]:
         raise ValueError("Event application or tenant mismatch")
     event_id = header.get("event_id")
@@ -53,11 +54,15 @@ def handle(code: str, payload: dict) -> bool:
     elif kind == "drive.notice.comment_add_v1":
         notice = event.get("notice_meta", {})
         if not event.get("is_mentioned") or notice.get("to_user_id", {}).get("open_id") != bot["open_id"]:
+            log.info("Comment ignored bot=%s reason=mention_or_recipient mentioned=%s recipient_matches=%s",
+                     code, event.get("is_mentioned"), notice.get("to_user_id", {}).get("open_id") == bot["open_id"])
             return False
         token = notice.get("file_token", "")
         if notice.get("file_type") != "docx" or not token.isalnum():
+            log.info("Comment ignored bot=%s reason=file_type file_type=%s", code, notice.get("file_type"))
             return False
-        if token not in bot.get("allowed_documents", []):
+        if not document_allowed(bot, token):
+            log.info("Comment ignored bot=%s reason=document_allowlist document=%s", code, token)
             return False
         comment = event.get("comment_id", "")
         if not comment.isalnum():

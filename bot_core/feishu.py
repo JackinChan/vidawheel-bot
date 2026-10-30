@@ -6,7 +6,7 @@ import time
 from urllib.parse import urlparse
 
 import httpx
-from bot_core.config import bot_config
+from bot_core.config import bot_config, document_allowed
 
 log = logging.getLogger(__name__)
 
@@ -50,7 +50,7 @@ def read_document(bot_code: str, url: str, comment_ids: list[str] | None = None,
             if node["obj_type"] != "docx":
                 raise ValueError("Document is not docx")
             token = node["obj_token"]
-        if token not in bot.get("allowed_documents", []):
+        if not document_allowed(bot, token):
             raise ValueError("Document outside configured application allowlist")
         metadata = get(f"/open-apis/docx/v1/documents/{token}")["document"]
         content = get(f"/open-apis/docx/v1/documents/{token}/raw_content")["content"]
@@ -69,8 +69,29 @@ def read_document(bot_code: str, url: str, comment_ids: list[str] | None = None,
         for comment_id in set(comment_ids or []):
             if not comment_id.isalnum():
                 raise ValueError("Invalid comment ID")
-            comment = get(f"/open-apis/drive/v1/files/{token}/comments/{comment_id}",
-                          {"file_type": "docx", "user_id_type": "open_id"})
+            try:
+                comment = get(f"/open-apis/drive/v1/files/{token}/comments/{comment_id}",
+                              {"file_type": "docx", "user_id_type": "open_id"})
+            except httpx.HTTPStatusError as error:
+                if error.response.status_code != 404:
+                    raise
+                # Some platform comment threads are visible through list/replies but
+                # the individual detail endpoint returns not-exist. Resolve the exact
+                # ID through the same bot's authorized list, never synthesize a quote.
+                comment, cursor = None, None
+                while True:
+                    page = get(f"/open-apis/drive/v1/files/{token}/comments", {
+                        "file_type": "docx", "page_size": 100, "user_id_type": "open_id",
+                        **({"page_token": cursor} if cursor else {})})
+                    comment = next((c for c in page.get("items", []) if c.get("comment_id") == comment_id), None)
+                    if comment or not page.get("has_more"):
+                        break
+                    next_cursor = page.get("page_token")
+                    if not next_cursor or next_cursor == cursor:
+                        raise ValueError("Comment listing pagination incomplete")
+                    cursor = next_cursor
+                if comment is None:
+                    raise ValueError("Comment not visible to originating bot") from error
             # Fetch every reply via the dedicated paginated endpoint, rather than relying
             # on the limited reply preview returned with the comment.
             replies, cursor = [], None
