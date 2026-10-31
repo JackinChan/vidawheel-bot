@@ -11,7 +11,7 @@
 | 当前状态 | 待评审，内部试用 |
 | 当前结论 | 插件清单、本地安装、stdio 工具、关闭清理、九项测试及真实 Docker HTTP MCP 只读连接通过；桌面既有聊天自动执行与 Mac 生命周期未验收。 |
 | 负责人 | 待指定 |
-| 最近更新 | 2026-10-30 by Codex |
+| 最近更新 | 2026-10-31 by Codex |
 
 ## 结构与实现
 
@@ -30,7 +30,7 @@
 - 实际构建产物通过官方 MCP SDK 的 stdio 初始化，发现七个工具，bridge_status 调用及关闭后 stopped 状态通过。
 - 使用本地 Docker 的真实 HTTP MCP，以现有个人身份读取任务列表与一个任务上下文成功，没有领取或完成真实任务。真实接口发现 FastMCP list_issues 按每行一个 text block 返回，已修复客户端解析并补充测试。
 - 依赖安装审计为零已知漏洞。dist/bridge.mjs 由 esbuild 生成，运行不依赖插件目录内的 node_modules；用户仍需 Node.js。
-- 已通过 CLI 注册本地插件源并安装。Git SSH 插件源的最终安装复核在提交后执行，结果以实际命令输出为准。
+- 2026-10-31 已推送提交 61c3dfb，并通过 Git SSH 插件源从同一远程仓库安装 0.1.1，CLI 列表确认 installed/enabled。安装产物不含 node_modules 或本机 artifacts，仍通过 stdio 初始化、七个工具、状态调用及关闭清理。默认 SSH 22 端口间歇超时，复核使用 SSH 443 并沿用已验证的 GitHub 主机密钥，没有关闭主机校验。
 
 ## 未验收与限制
 
